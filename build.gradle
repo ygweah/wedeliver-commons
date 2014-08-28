@@ -1,0 +1,215 @@
+import org.apache.tools.ant.filters.*
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'groovy'
+
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+
+  dependencies {
+    classpath 'org.postgresql:postgresql:9.3-1101-jdbc41'
+  }
+}
+
+def javaVersion = '1.7'
+def jdbcJar = 'org.postgresql:postgresql:9.3-1101-jdbc41'
+
+task wrapper(type: Wrapper) { gradleVersion = '1.12' }
+
+configurations {
+  jdbc
+}
+
+/**
+ * Setup dependency library
+ */
+dependencies {
+//  compile "org.mongodb.morphia:morphia:0.107"
+//  compile "org.mongodb.morphia:morphia-logging-slf4j:0.107"
+//  compile "org.mongodb.morphia:morphia-validation:0.107"
+
+  compile "log4j:log4j:1.2.17"
+  compile "org.slf4j:slf4j-api:1.7.7"
+  compile 'org.slf4j:slf4j-log4j12:1.7.7'
+  // compile 'org.slf4j:jul-to-slf4j:1.7.7'
+
+  compile 'javax.mail:mail:1.4.7'
+  // compile "javax.servlet:servlet-api:2.5"
+
+  compile ('org.apache.struts:struts2-core:2.3.16.3') {
+    exclude group: 'javassist', module: 'javassist'
+  }
+  compile 'org.codehaus.groovy:groovy-all:2.3.2'
+  compile 'com.google.inject:guice:3.0'
+  compile 'com.google.inject.extensions:guice-assistedinject:3.0'
+  compile 'com.google.inject.extensions:guice-servlet:3.0'
+  compile 'com.google.guava:guava:17.0'
+  compile 'com.google.code.findbugs:jsr305:3.0.0'
+  compile 'com.jolbox:bonecp:0.8.0.RELEASE'
+  compile 'org.hibernate:hibernate-core:4.3.5.Final'
+  compile 'org.hibernate:hibernate-c3p0:4.3.5.Final'
+  compile 'org.ostermiller:utils:1.07.00'
+  compile 'joda-time:joda-time:2.4'
+  compile 'org.apache.httpcomponents:httpclient:4.3.5'
+  compile 'org.freemarker:freemarker:2.3.20'
+  compile 'commons-codec:commons-codec:1.9'
+  compile 'commons-configuration:commons-configuration:1.10'
+
+  compile 'com.amazonaws:aws-java-sdk:1.8.4'
+  compile 'com.braintreepayments.gateway:braintree-java:2.30.1'
+  compile 'com.twilio.sdk:twilio-java-sdk:3.4.5'
+  compile 'com.sendgrid:sendgrid-java:1.2.0'
+
+
+  testCompile "junit:junit:4.11"
+  testCompile jdbcJar
+
+  // This is needed to publish jar to Cloudbees repo
+  archives 'org.apache.maven.wagon:wagon-webdav-jackrabbit:2.6'
+}
+
+/**
+ * Setup maven repositories.
+ */
+repositories {
+  mavenCentral()
+
+  maven {
+    name 'internal release'
+    url cloudbeesReleaseRepo
+    credentials {
+      username cloudbeesRepoUsername
+      password cloudbeesRepoPassword
+    }
+  }
+
+  maven {
+    name 'internal snapshot'
+    url cloudbeesSnapshotRepo
+    credentials {
+      username cloudbeesRepoUsername
+      password cloudbeesRepoPassword
+    }
+  }
+}
+
+/**
+ * Ensure source and binary versions are consistent with runtime environment.
+ */
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
+
+/**
+ * Jar file name consists of the pom artifact id and version.
+ */
+jar {
+  if (project.hasProperty('pomArtifactId'))
+    baseName = pomArtifactId
+  if (project.hasProperty('pomVersion'))
+    version =  pomVersion
+}
+
+//tasks.withType(GroovyCompile) {
+//  options.compilerArgs << '-Xlint:deprecation' << '-Xlint:unchecked'
+//}
+
+install {
+  repositories.mavenInstaller {
+    if (project.hasProperty('pomGroupId'))
+      pom.groupId = pomGroupId
+    if (project.hasProperty('pomArtifactId'))
+      pom.artifactId = pomArtifactId
+    if (project.hasProperty('pomVersion'))
+      pom.version = pomVersion
+  }
+}
+
+/**
+ * Publish jar to maven repository.
+ * The version ending with '-SNAPSHOT' will be to snapshot repo, otherwise release repo.
+ */
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      configuration = configurations.archives
+      repository(url: "dav:$cloudbeesReleaseRepo") {
+        authentication(userName: cloudbeesRepoUsername, password: cloudbeesRepoPassword)
+      }
+      snapshotRepository(url: "dav:$cloudbeesSnapshotRepo") {
+        authentication(userName: cloudbeesRepoUsername, password: cloudbeesRepoPassword)
+      }
+      if (project.hasProperty('pomGroupId'))
+        pom.groupId = pomGroupId
+      if (project.hasProperty('pomArtifactId'))
+        pom.artifactId = pomArtifactId
+      if (project.hasProperty('pomVersion'))
+        pom.version = pomVersion
+    }
+  }
+}
+
+/**
+ * Load properties from sources: gradle.properties, project.properties, $wedeliver.properties, command line
+ * (-Dproperty=value, through System.getProperties()).
+ * If a property is defined in multiple sources, the last one is used.
+ */
+def loadProperties() {
+  def properties = new Properties()
+  def propertyFile = new java.io.File("${project.projectDir}/gradle.properties")
+
+  println "Loading gradle properties file: ${propertyFile.name}"
+  properties.load(new FileInputStream(propertyFile))
+
+  propertyFile = new java.io.File("${project.projectDir}/project.properties")
+  if (propertyFile.exists()) {
+    println "Loading project properties file: ${propertyFile.name}"
+    properties.load(new FileInputStream(propertyFile))
+  }
+
+  if (project.hasProperty('wedeliver.properties')) {
+    propertyFile = new java.io.File(project['wedeliver.properties'])
+
+    println "Loading wedeliver properties file: ${propertyFile.name}"
+    properties.load(new FileInputStream(propertyFile))
+
+    properties.setProperty('wedeliver.properties', project['wedeliver.properties'])
+    properties.setProperty('wedeliver.build', project['wedeliver.properties'].replaceAll(".*/", "").replaceAll("\\..*", ""))
+  }
+
+  properties.putAll(System.getProperties());
+  properties
+}
+
+/**
+ * Set as project properties so it's accessible from other tasks
+ */
+ext {
+  wedeliverProperties = loadProperties();
+}
+
+/**
+ * Configure tasks to perform token replacement on resources and webapp files.
+ * The name of the properties file can be passed in as property:
+ *   -Pwedeliver.properties=production.properties
+ *
+ * The default is project.properties.
+ * If the file doesn't exists, gradle.properties will be used.
+ */
+def filterResources(tasks) {
+  tasks.each {
+    configure(it) {
+      filter(ReplaceTokens, tokens: wedeliverProperties)
+    }
+  }
+}
+
+/**
+ * Apply token replacement config to these tasks
+ */
+filterResources([
+  processResources,
+  processTestResources
+])
