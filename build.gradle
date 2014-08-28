@@ -27,45 +27,17 @@ configurations {
  * Setup dependency library
  */
 dependencies {
-//  compile "org.mongodb.morphia:morphia:0.107"
-//  compile "org.mongodb.morphia:morphia-logging-slf4j:0.107"
-//  compile "org.mongodb.morphia:morphia-validation:0.107"
-
   compile "log4j:log4j:1.2.17"
   compile "org.slf4j:slf4j-api:1.7.7"
   compile 'org.slf4j:slf4j-log4j12:1.7.7'
-  // compile 'org.slf4j:jul-to-slf4j:1.7.7'
 
   compile 'javax.mail:mail:1.4.7'
-  // compile "javax.servlet:servlet-api:2.5"
 
-  compile ('org.apache.struts:struts2-core:2.3.16.3') {
-    exclude group: 'javassist', module: 'javassist'
-  }
-  compile 'org.codehaus.groovy:groovy-all:2.3.2'
   compile 'com.google.inject:guice:3.0'
-  compile 'com.google.inject.extensions:guice-assistedinject:3.0'
-  compile 'com.google.inject.extensions:guice-servlet:3.0'
-  compile 'com.google.guava:guava:17.0'
-  compile 'com.google.code.findbugs:jsr305:3.0.0'
-  compile 'com.jolbox:bonecp:0.8.0.RELEASE'
-  compile 'org.hibernate:hibernate-core:4.3.5.Final'
-  compile 'org.hibernate:hibernate-c3p0:4.3.5.Final'
-  compile 'org.ostermiller:utils:1.07.00'
-  compile 'joda-time:joda-time:2.4'
-  compile 'org.apache.httpcomponents:httpclient:4.3.5'
-  compile 'org.freemarker:freemarker:2.3.20'
   compile 'commons-codec:commons-codec:1.9'
-  compile 'commons-configuration:commons-configuration:1.10'
-
-  compile 'com.amazonaws:aws-java-sdk:1.8.4'
-  compile 'com.braintreepayments.gateway:braintree-java:2.30.1'
-  compile 'com.twilio.sdk:twilio-java-sdk:3.4.5'
   compile 'com.sendgrid:sendgrid-java:1.2.0'
 
-
   testCompile "junit:junit:4.11"
-  testCompile jdbcJar
 
   // This is needed to publish jar to Cloudbees repo
   archives 'org.apache.maven.wagon:wagon-webdav-jackrabbit:2.6'
