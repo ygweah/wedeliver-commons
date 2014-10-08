@@ -3,7 +3,10 @@ package us.wedeliver.commons.util;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
+import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Module;
+import com.google.inject.util.Modules;
 
 public class GuiceTest {
   public static Injector injector;
@@ -16,7 +19,9 @@ public class GuiceTest {
         Properties properties = PropertiesUtil.load("/junit.properties");
         String moduleNames = properties.getProperty("junit.guice.modules");
         String overrideModuleNames = properties.getProperty("junit.guice.override_modules");
-        return GuiceUtil.createInjector(moduleNames, overrideModuleNames);
+        Module module = GuiceUtil.createModule(moduleNames, overrideModuleNames);
+        PropertiesModule propertiesModule = new PropertiesModule("/guice.properties");
+        return Guice.createInjector(Modules.combine(module, propertiesModule));
       }
     });
 
