@@ -17,9 +17,9 @@ public class ExecutorServiceSupport {
     this.shutdownSupport = shutdownSupport;
   }
 
-  public ExecutorService registerWithShutdownUtil(final String name,
-                                                  final int priority,
-                                                  final ExecutorService executorService) {
+  public ExecutorService registerForShutdown(final String name,
+                                             final int priority,
+                                             final ExecutorService executorService) {
     shutdownSupport.addShutdownHook(new Runnable() {
 
       @Override
