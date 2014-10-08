@@ -14,13 +14,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-public class ShutdownUtil {
+public class ShutdownSupport {
+  public static final int HIGH_PRIORITY = 10;
+  public static final int NORMAL_PRIORITY = 5;
+  public static final int LOW_PRIORITY = 1;
+
   private Logger logger = LoggerFactory.getLogger(getClass());
 
   private SortedMap<Integer, Collection<Runnable>> hooksByPriority = new TreeMap<>(Collections.reverseOrder());
 
   @Inject
-  public ShutdownUtil() {
+  public ShutdownSupport() {
   }
 
   public void addShutdownHook(Runnable shutdownHook, int priority) {
