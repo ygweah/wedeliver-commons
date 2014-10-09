@@ -16,7 +16,7 @@ public class GuiceUtil {
   private static final Logger logger = LoggerFactory.getLogger(GuiceUtil.class);
 
   public static Module createModule(String moduleNames, String overrideModuleNames) {
-    Module module = createGuiceModule(overrideModuleNames);
+    Module module = createGuiceModule(moduleNames);
     Module overrideModule = createGuiceModule(overrideModuleNames);
     return Modules.override(module).with(overrideModule);
   }

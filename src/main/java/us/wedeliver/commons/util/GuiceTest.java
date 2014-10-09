@@ -3,12 +3,17 @@ package us.wedeliver.commons.util;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.util.Modules;
 
 public class GuiceTest {
+  private static final Logger logger = LoggerFactory.getLogger(GuiceTest.class);
+
   public static Injector injector;
 
   static {
@@ -17,6 +22,8 @@ public class GuiceTest {
       @Override
       public Injector call() throws Exception {
         Properties properties = PropertiesUtil.load("/junit.properties");
+        logger.info("Properties loaded: ", properties);
+
         String moduleNames = properties.getProperty("junit.guice.modules");
         String overrideModuleNames = properties.getProperty("junit.guice.override_modules");
         Module module = GuiceUtil.createModule(moduleNames, overrideModuleNames);
