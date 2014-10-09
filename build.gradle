@@ -2,7 +2,6 @@ import org.apache.tools.ant.filters.*
 
 apply plugin: 'java'
 apply plugin: 'maven'
-apply plugin: 'groovy'
 
 buildscript {
   repositories {
@@ -10,12 +9,10 @@ buildscript {
   }
 
   dependencies {
-    classpath 'org.postgresql:postgresql:9.3-1101-jdbc41'
   }
 }
 
 def javaVersion = '1.7'
-def jdbcJar = 'org.postgresql:postgresql:9.3-1101-jdbc41'
 
 task wrapper(type: Wrapper) { gradleVersion = '1.12' }
 
@@ -83,10 +80,6 @@ jar {
   if (project.hasProperty('pomVersion'))
     version =  pomVersion
 }
-
-//tasks.withType(GroovyCompile) {
-//  options.compilerArgs << '-Xlint:deprecation' << '-Xlint:unchecked'
-//}
 
 install {
   repositories.mavenInstaller {
