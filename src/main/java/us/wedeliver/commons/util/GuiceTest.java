@@ -22,7 +22,7 @@ public class GuiceTest {
       @Override
       public Injector call() throws Exception {
         Properties properties = PropertiesUtil.load("/junit.properties");
-        logger.info("Properties loaded: ", properties);
+        logger.info("Properties loaded: {}", properties);
 
         String moduleNames = properties.getProperty("junit.guice.modules");
         String overrideModuleNames = properties.getProperty("junit.guice.override_modules");
