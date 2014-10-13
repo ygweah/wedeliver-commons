@@ -15,14 +15,25 @@ import com.google.inject.util.Modules;
 public class GuiceUtil {
   private static final Logger logger = LoggerFactory.getLogger(GuiceUtil.class);
 
-  public static Module createModule(String moduleNames, String overrideModuleNames) {
+  public static Module createModule(String moduleNames,
+                                    String propertiesResources,
+                                    String overrideModuleNames,
+                                    String overridePropertiesResources) {
     Module module = createGuiceModule(moduleNames);
+    Module propertiesModule = createPropertiesModule(propertiesResources);
     Module overrideModule = createGuiceModule(overrideModuleNames);
-    return Modules.override(module).with(overrideModule);
+    Module overridePropertiesModule = createPropertiesModule(overridePropertiesResources);
+    return Modules.override(module, propertiesModule).with(overrideModule, overridePropertiesModule);
   }
 
-  public static Injector createInjector(String moduleNames, String overrideModuleNames) {
-    return Guice.createInjector(createModule(moduleNames, overrideModuleNames));
+  public static Injector createInjector(String moduleNames,
+                                        String propertiesResources,
+                                        String overrideModuleNames,
+                                        String overridePropertiesResources) {
+    return Guice.createInjector(createModule(moduleNames,
+                                             propertiesResources,
+                                             overrideModuleNames,
+                                             overridePropertiesResources));
   }
 
   private static Module createGuiceModule(String moduleNames) {
@@ -30,14 +41,29 @@ public class GuiceUtil {
     Collection<Module> modules = new LinkedList<>();
     if (moduleNames != null && !moduleNames.isEmpty()) {
       for (String moduleName : moduleNames.split(",")) {
-        modules.add(createGuiceModuleFrom(moduleName));
+        moduleName = moduleName.trim();
+        if (!moduleName.isEmpty())
+          modules.add(createGuiceModuleInstance(moduleName));
       }
     }
     return Modules.combine(modules);
   }
 
-  private static Module createGuiceModuleFrom(final String moduleName) {
-    logger.info("Creating guice module: {}", moduleName);
+  private static Module createPropertiesModule(String propertiesResources) {
+    logger.info("Creating properties modules: {}", propertiesResources);
+    Collection<Module> modules = new LinkedList<>();
+    if (propertiesResources != null && !propertiesResources.isEmpty()) {
+      for (String propertiesResource : propertiesResources.split(",")) {
+        propertiesResource = propertiesResource.trim();
+        if (!propertiesResource.isEmpty())
+          modules.add(createPropertiesModuleInstance(propertiesResource));
+      }
+    }
+    return Modules.combine(modules);
+  }
+
+  private static Module createGuiceModuleInstance(final String moduleName) {
+    logger.info("Creating guice module instance: {}", moduleName);
     return ExceptionUtil.unchecked(new Callable<Module>() {
 
       @Override
@@ -47,6 +73,11 @@ public class GuiceUtil {
         return moduleClass.newInstance();
       }
     });
+  }
+
+  private static Module createPropertiesModuleInstance(String propertiesResource) {
+    logger.info("Creating properties module instance: {}", propertiesResource);
+    return new PropertiesModule(propertiesResource);
   }
 
 }
