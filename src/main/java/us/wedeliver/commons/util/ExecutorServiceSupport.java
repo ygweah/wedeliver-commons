@@ -1,5 +1,6 @@
 package us.wedeliver.commons.util;
 
+import java.lang.ref.WeakReference;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -20,6 +21,13 @@ public class ExecutorServiceSupport {
   public ExecutorService registerForShutdown(final String name,
                                              final int priority,
                                              final ExecutorService executorService) {
+    registerExecutorService(name, priority, new WeakReference<>(executorService));
+    return executorService;
+  }
+
+  public void registerExecutorService(final String name,
+                                      final int priority,
+                                      final WeakReference<ExecutorService> executorServiceRef) {
     shutdownSupport.addShutdownHook(new Runnable() {
 
       @Override
@@ -29,7 +37,8 @@ public class ExecutorServiceSupport {
 
       @Override
       public void run() {
-        if (!executorService.isShutdown()) {
+        final ExecutorService executorService = executorServiceRef.get();
+        if (executorService != null && !executorService.isShutdown()) {
           executorService.shutdown();
           ExceptionUtil.unchecked(new Callable<Void>() {
 
@@ -42,7 +51,6 @@ public class ExecutorServiceSupport {
         }
       }
     }, priority);
-    return executorService;
   }
 
 }

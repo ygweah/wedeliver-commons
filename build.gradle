@@ -30,7 +30,15 @@ dependencies {
 
   compile 'javax.mail:mail:1.4.7'
 
+  compile "javax.servlet:servlet-api:2.5"
+
+  compile ('org.apache.struts:struts2-core:2.3.16.3') {
+    exclude group: 'javassist', module: 'javassist'
+  }
+
   compile 'com.google.inject:guice:3.0'
+  compile 'com.google.inject.extensions:guice-servlet:3.0'
+  compile 'com.google.inject.extensions:guice-struts2:3.0'
   compile 'commons-codec:commons-codec:1.9'
   compile 'com.sendgrid:sendgrid-java:1.2.0'
 
