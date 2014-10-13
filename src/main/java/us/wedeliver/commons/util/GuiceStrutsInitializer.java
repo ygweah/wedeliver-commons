@@ -13,7 +13,7 @@ import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.inject.servlet.ServletModule;
 import com.google.inject.struts2.Struts2GuicePluginModule;
 
-public class GuiceInitializer extends GuiceServletContextListener {
+public class GuiceStrutsInitializer extends GuiceServletContextListener {
   private static final String MODULES_PARAM = "guice-modules";
   private static final String PROPERTIES_PARAM = "guice-properties";
   private static final String OVERRIDE_MODULES_PARAM = "guice-override-modules";
