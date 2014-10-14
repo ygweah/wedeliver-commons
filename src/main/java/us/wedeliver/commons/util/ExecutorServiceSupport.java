@@ -18,11 +18,8 @@ public class ExecutorServiceSupport {
     this.shutdownSupport = shutdownSupport;
   }
 
-  public ExecutorService registerForShutdown(final String name,
-                                             final int priority,
-                                             final ExecutorService executorService) {
+  public void registerForShutdown(final String name, final int priority, final ExecutorService executorService) {
     registerExecutorService(name, priority, new WeakReference<>(executorService));
-    return executorService;
   }
 
   private void registerExecutorService(final String name,
