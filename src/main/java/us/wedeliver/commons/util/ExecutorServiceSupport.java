@@ -25,9 +25,9 @@ public class ExecutorServiceSupport {
     return executorService;
   }
 
-  public void registerExecutorService(final String name,
-                                      final int priority,
-                                      final WeakReference<ExecutorService> executorServiceRef) {
+  private void registerExecutorService(final String name,
+                                       final int priority,
+                                       final WeakReference<ExecutorService> executorServiceRef) {
     shutdownSupport.addShutdownHook(new Runnable() {
 
       @Override
