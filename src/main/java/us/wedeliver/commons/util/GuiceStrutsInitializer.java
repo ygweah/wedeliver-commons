@@ -19,6 +19,12 @@ public class GuiceStrutsInitializer extends GuiceServletContextListener {
   private static final String OVERRIDE_MODULES_PARAM = "guice-override-modules";
   private static final String OVERRIDE_PROPERTIES_PARAM = "guice-override-properties";
 
+  private static final String INJECTOR_NAME = GuiceStrutsInitializer.class.getName();
+
+  public static final Injector getInjector(ServletContext servletContext) {
+    return (Injector) servletContext.getAttribute(INJECTOR_NAME);
+  }
+
   private Injector injector;
 
   @Override
@@ -30,6 +36,7 @@ public class GuiceStrutsInitializer extends GuiceServletContextListener {
     injector = Guice.createInjector(new Struts2GuicePluginModule(),
                                     createServletModule(servletContext),
                                     createApplicationModule(servletContext));
+    servletContext.setAttribute(INJECTOR_NAME, injector);
   }
 
   protected Module createServletModule(ServletContext servletContext) {
@@ -55,6 +62,7 @@ public class GuiceStrutsInitializer extends GuiceServletContextListener {
   public void contextInitialized(ServletContextEvent servletContextEvent) {
     createInjector(servletContextEvent.getServletContext());
     super.contextInitialized(servletContextEvent);
+
   }
 
   @Override
