@@ -27,7 +27,7 @@ public class ShutdownSupport {
   public ShutdownSupport() {
   }
 
-  public void addShutdownHook(Runnable shutdownHook, int priority) {
+  public synchronized void addShutdownHook(Runnable shutdownHook, int priority) {
     logger.info("Adding shutdown hook [{}]: {}", priority, shutdownHook);
     Collection<Runnable> hooks = hooksByPriority.get(priority);
     if (hooks == null) {
@@ -37,8 +37,7 @@ public class ShutdownSupport {
     hooks.add(shutdownHook);
   }
 
-  public void shutdown() {
-    logger.info("SHUTDWON ACALLLED ======================");
+  public synchronized void shutdown() {
     for (Map.Entry<Integer, Collection<Runnable>> mapEntry : hooksByPriority.entrySet()) {
       Integer priority = mapEntry.getKey();
       for (Runnable shutdownHook : mapEntry.getValue()) {
