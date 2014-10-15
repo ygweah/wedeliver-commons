@@ -59,10 +59,13 @@ public class GuiceStrutsInitializer extends GuiceServletContextListener {
 
   @Override
   public void contextDestroyed(ServletContextEvent servletContextEvent) {
-    ShutdownSupport shutdownSupport = injector.getInstance(ShutdownSupport.class);
-    shutdownSupport.shutdown();
+    if (injector != null) {
+      ShutdownSupport shutdownSupport = injector.getInstance(ShutdownSupport.class);
+      shutdownSupport.shutdown();
+    }
 
     super.contextDestroyed(servletContextEvent);
+    injector = null;
   }
 
 }
