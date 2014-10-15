@@ -28,9 +28,7 @@ public class ShutdownSupport {
   }
 
   public void addShutdownHook(Runnable shutdownHook, int priority) {
-    if (logger.isInfoEnabled())
-      logger.info("Adding shutdown hook [{}]: {}", priority, shutdownHook);
-
+    logger.info("Adding shutdown hook [{}]: {}", priority, shutdownHook);
     Collection<Runnable> hooks = hooksByPriority.get(priority);
     if (hooks == null) {
       hooks = new LinkedList<>();
@@ -42,16 +40,16 @@ public class ShutdownSupport {
   public void shutdown() {
     for (Map.Entry<Integer, Collection<Runnable>> mapEntry : hooksByPriority.entrySet()) {
       Integer priority = mapEntry.getKey();
-      for (Runnable shutdownHook : mapEntry.getValue())
+      for (Runnable shutdownHook : mapEntry.getValue()) {
         try {
-          if (logger.isInfoEnabled())
-            logger.info("Running shutdown hook [{}]: {}", priority, shutdownHook);
-
+          logger.info("Running shutdown hook [{}]: {}", priority, shutdownHook);
           shutdownHook.run();
         } catch (Exception e) {
           logger.error("Shutdown Hook Error: " + shutdownHook, e);
         }
+      }
     }
+    hooksByPriority.clear();
   }
 
 }
