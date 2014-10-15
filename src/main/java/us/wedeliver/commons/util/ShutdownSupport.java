@@ -38,6 +38,7 @@ public class ShutdownSupport {
   }
 
   public void shutdown() {
+    logger.info("SHUTDWON ACALLLED ======================");
     for (Map.Entry<Integer, Collection<Runnable>> mapEntry : hooksByPriority.entrySet()) {
       Integer priority = mapEntry.getKey();
       for (Runnable shutdownHook : mapEntry.getValue()) {
