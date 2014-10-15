@@ -1,6 +1,5 @@
 package us.wedeliver.commons.util;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -9,14 +8,14 @@ import javax.inject.Provider;
 
 import com.google.common.base.Supplier;
 
-public class ExecutorProvider implements Provider<Executor> {
+public class ExecutorServiceProvider implements Provider<ExecutorService> {
   private String name;
   private int priority;
   private Supplier<ExecutorService> executorServiceSupplier;
   private ExecutorServiceSupport executorServiceSupport;
 
   @Inject
-  public ExecutorProvider(String name,
+  public ExecutorServiceProvider(String name,
                           int priority,
                           Supplier<ExecutorService> executorServiceSupplier,
                           ExecutorServiceSupport executorServiceSupport) {
@@ -26,7 +25,7 @@ public class ExecutorProvider implements Provider<Executor> {
     this.executorServiceSupport = executorServiceSupport;
   }
 
-  public ExecutorProvider(String name, int priority, final int nThreads, ExecutorServiceSupport executorServiceSupport) {
+  public ExecutorServiceProvider(String name, int priority, final int nThreads, ExecutorServiceSupport executorServiceSupport) {
     this.name = name;
     this.priority = priority;
     this.executorServiceSupplier = new Supplier<ExecutorService>() {
@@ -38,7 +37,7 @@ public class ExecutorProvider implements Provider<Executor> {
     this.executorServiceSupport = executorServiceSupport;
   }
 
-  public ExecutorProvider(String name, int priority, ExecutorServiceSupport executorServiceSupport) {
+  public ExecutorServiceProvider(String name, int priority, ExecutorServiceSupport executorServiceSupport) {
     this.name = name;
     this.priority = priority;
     this.executorServiceSupplier = new Supplier<ExecutorService>() {
@@ -51,7 +50,7 @@ public class ExecutorProvider implements Provider<Executor> {
   }
 
   @Override
-  public Executor get() {
+  public ExecutorService get() {
     ExecutorService executorService = executorServiceSupplier.get();
     executorServiceSupport.registerForShutdown(name, priority, executorService);
     return executorService;
