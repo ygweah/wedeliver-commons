@@ -15,6 +15,8 @@ import com.google.inject.util.Modules;
 public class GuiceUtil {
   private static final Logger logger = LoggerFactory.getLogger(GuiceUtil.class);
 
+  private static final String DELIMITER_PATTERN = "[,:|]";
+
   public static Module createModule(String moduleNames,
                                     String propertiesResources,
                                     String overrideModuleNames,
@@ -40,7 +42,7 @@ public class GuiceUtil {
     logger.info("Creating guice modules: {}", moduleNames);
     Collection<Module> modules = new LinkedList<>();
     if (moduleNames != null && !moduleNames.isEmpty()) {
-      for (String moduleName : moduleNames.split(",")) {
+      for (String moduleName : moduleNames.split(DELIMITER_PATTERN)) {
         moduleName = moduleName.trim();
         if (!moduleName.isEmpty())
           modules.add(createGuiceModuleInstance(moduleName));
@@ -53,7 +55,7 @@ public class GuiceUtil {
     logger.info("Creating properties modules: {}", propertiesResources);
     Collection<Module> modules = new LinkedList<>();
     if (propertiesResources != null && !propertiesResources.isEmpty()) {
-      for (String propertiesResource : propertiesResources.split(",")) {
+      for (String propertiesResource : propertiesResources.split(DELIMITER_PATTERN)) {
         propertiesResource = propertiesResource.trim();
         if (!propertiesResource.isEmpty())
           modules.add(createPropertiesModuleInstance(propertiesResource));
