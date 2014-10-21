@@ -5,6 +5,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
 import org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -25,6 +27,7 @@ public class GuiceStrutsInitializer extends GuiceServletContextListener {
     return (Injector) servletContext.getAttribute(INJECTOR_NAME);
   }
 
+  private Logger logger = LoggerFactory.getLogger(getClass());
   private Injector injector;
 
   @Override
@@ -52,9 +55,17 @@ public class GuiceStrutsInitializer extends GuiceServletContextListener {
 
   protected Module createApplicationModule(ServletContext servletContext) {
     String moduleNames = servletContext.getInitParameter(MODULES_PARAM);
+    logger.info("Using guice modules: {}", moduleNames);
+
     String propertiesResources = servletContext.getInitParameter(PROPERTIES_PARAM);
+    logger.info("Using guice properties: {}", propertiesResources);
+
     String overrideModuleNames = servletContext.getInitParameter(OVERRIDE_MODULES_PARAM);
+    logger.info("Using guice override modules: {}", overrideModuleNames);
+
     String overridePropertiesResources = servletContext.getInitParameter(OVERRIDE_PROPERTIES_PARAM);
+    logger.info("Using guice override properties: {}", overridePropertiesResources);
+
     return GuiceUtil.createModule(moduleNames, propertiesResources, overrideModuleNames, overridePropertiesResources);
   }
 
