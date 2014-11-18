@@ -24,6 +24,19 @@ public class SchedulerProvider implements Provider<Scheduler> {
     this.schedulerSupport = schedulerSupport;
   }
 
+  public SchedulerProvider(String name, int priority, SchedulerSupport schedulerSupport) {
+    this.name = name;
+    this.priority = priority;
+    this.schedulerSupplier = new Supplier<Scheduler>() {
+
+      @Override
+      public Scheduler get() {
+        return new Scheduler();
+      }
+    };
+    this.schedulerSupport = schedulerSupport;
+  }
+
   @Override
   public Scheduler get() {
     Scheduler scheduler = schedulerSupplier.get();

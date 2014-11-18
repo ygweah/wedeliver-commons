@@ -25,7 +25,6 @@ public class ScheduledExecutorServiceProvider implements Provider<ScheduledExecu
     this.executorServiceSupport = executorServiceSupport;
   }
 
-  @Inject
   public ScheduledExecutorServiceProvider(String name,
                                           int priority,
                                           final int corePoolSize,
