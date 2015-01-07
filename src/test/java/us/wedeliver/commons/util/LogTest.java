@@ -9,7 +9,7 @@ public class LogTest {
 
   @Test
   public void error() throws InterruptedException {
-    logger.error("Unit Test Failure", new RuntimeException("Intentional"));
+    logger.error("Unit Test Failure", new RuntimeException("Intentional, Ignore"));
     Thread.sleep(10000L);
   }
 
