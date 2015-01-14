@@ -8,8 +8,12 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Singleton
 public class ExecutorServiceSupport {
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private ShutdownSupport shutdownSupport;
 
@@ -18,12 +22,16 @@ public class ExecutorServiceSupport {
     this.shutdownSupport = shutdownSupport;
   }
 
-  public void registerForShutdown(final String name, final int priority, final ExecutorService executorService) {
-    registerExecutorService(name, priority, new WeakReference<>(executorService));
+  public void registerForShutdown(final String name,
+                                  final int priority,
+                                  final long shutdownTimeoutSeconds,
+                                  final ExecutorService executorService) {
+    registerExecutorService(name, priority, shutdownTimeoutSeconds, new WeakReference<>(executorService));
   }
 
   private void registerExecutorService(final String name,
                                        final int priority,
+                                       final long shutdownTimeoutSeconds,
                                        final WeakReference<ExecutorService> executorServiceRef) {
     shutdownSupport.addShutdownHook(new Runnable() {
 
@@ -41,7 +49,9 @@ public class ExecutorServiceSupport {
 
             @Override
             public Void call() throws Exception {
-              executorService.awaitTermination(1L, TimeUnit.DAYS);
+              executorService.shutdownNow();
+              if (!executorService.awaitTermination(shutdownTimeoutSeconds, TimeUnit.SECONDS))
+                logger.error("Timeout {} seconds awaiting termination: {}", shutdownTimeoutSeconds, name);
               return null;
             }
           });

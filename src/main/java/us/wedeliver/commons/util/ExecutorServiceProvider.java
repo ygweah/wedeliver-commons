@@ -11,23 +11,31 @@ import com.google.common.base.Supplier;
 public class ExecutorServiceProvider implements Provider<ExecutorService> {
   private String name;
   private int priority;
+  private long shutdownTimeoutSeconds;
   private Supplier<ExecutorService> executorServiceSupplier;
   private ExecutorServiceSupport executorServiceSupport;
 
   @Inject
   public ExecutorServiceProvider(String name,
-                          int priority,
-                          Supplier<ExecutorService> executorServiceSupplier,
-                          ExecutorServiceSupport executorServiceSupport) {
+                                 int priority,
+                                 long shutdownTimeoutSeconds,
+                                 Supplier<ExecutorService> executorServiceSupplier,
+                                 ExecutorServiceSupport executorServiceSupport) {
     this.name = name;
     this.priority = priority;
+    this.shutdownTimeoutSeconds = shutdownTimeoutSeconds;
     this.executorServiceSupplier = executorServiceSupplier;
     this.executorServiceSupport = executorServiceSupport;
   }
 
-  public ExecutorServiceProvider(String name, int priority, final int nThreads, ExecutorServiceSupport executorServiceSupport) {
+  public ExecutorServiceProvider(String name,
+                                 int priority,
+                                 long shutdownTimeoutSeconds,
+                                 final int nThreads,
+                                 ExecutorServiceSupport executorServiceSupport) {
     this.name = name;
     this.priority = priority;
+    this.shutdownTimeoutSeconds = shutdownTimeoutSeconds;
     this.executorServiceSupplier = new Supplier<ExecutorService>() {
       @Override
       public ExecutorService get() {
@@ -37,9 +45,13 @@ public class ExecutorServiceProvider implements Provider<ExecutorService> {
     this.executorServiceSupport = executorServiceSupport;
   }
 
-  public ExecutorServiceProvider(String name, int priority, ExecutorServiceSupport executorServiceSupport) {
+  public ExecutorServiceProvider(String name,
+                                 int priority,
+                                 long shutdownTimeoutSeconds,
+                                 ExecutorServiceSupport executorServiceSupport) {
     this.name = name;
     this.priority = priority;
+    this.shutdownTimeoutSeconds = shutdownTimeoutSeconds;
     this.executorServiceSupplier = new Supplier<ExecutorService>() {
       @Override
       public ExecutorService get() {
@@ -52,7 +64,7 @@ public class ExecutorServiceProvider implements Provider<ExecutorService> {
   @Override
   public ExecutorService get() {
     ExecutorService executorService = executorServiceSupplier.get();
-    executorServiceSupport.registerForShutdown(name, priority, executorService);
+    executorServiceSupport.registerForShutdown(name, priority, shutdownTimeoutSeconds, executorService);
     return executorService;
   }
 

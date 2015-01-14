@@ -11,26 +11,31 @@ import com.google.common.base.Supplier;
 public class ScheduledExecutorServiceProvider implements Provider<ScheduledExecutorService> {
   private String name;
   private int priority;
+  private long shutdownTimeoutSeconds;
   private Supplier<ScheduledExecutorService> executorSupplier;
   private ExecutorServiceSupport executorServiceSupport;
 
   @Inject
   public ScheduledExecutorServiceProvider(String name,
                                           int priority,
+                                          long shutdownTimeoutSeconds,
                                           Supplier<ScheduledExecutorService> executorSupplier,
                                           ExecutorServiceSupport executorServiceSupport) {
     this.name = name;
     this.priority = priority;
+    this.shutdownTimeoutSeconds = shutdownTimeoutSeconds;
     this.executorSupplier = executorSupplier;
     this.executorServiceSupport = executorServiceSupport;
   }
 
   public ScheduledExecutorServiceProvider(String name,
                                           int priority,
+                                          long shutdownTimeoutSeconds,
                                           final int corePoolSize,
                                           ExecutorServiceSupport executorServiceSupport) {
     this.name = name;
     this.priority = priority;
+    this.shutdownTimeoutSeconds = shutdownTimeoutSeconds;
     this.executorSupplier = new Supplier<ScheduledExecutorService>() {
 
       @Override
@@ -44,7 +49,7 @@ public class ScheduledExecutorServiceProvider implements Provider<ScheduledExecu
   @Override
   public ScheduledExecutorService get() {
     ScheduledExecutorService executor = executorSupplier.get();
-    executorServiceSupport.registerForShutdown(name, priority, executor);
+    executorServiceSupport.registerForShutdown(name, priority, shutdownTimeoutSeconds, executor);
     return executor;
   }
 
