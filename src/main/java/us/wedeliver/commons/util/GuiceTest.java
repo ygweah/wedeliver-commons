@@ -3,6 +3,7 @@ package us.wedeliver.commons.util;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +43,14 @@ public class GuiceTest {
 
   public <T> T find(Class<T> type) {
     return injector.getInstance(type);
+  }
+
+  public void print(Object obj) {
+    logger.debug(String.valueOf(obj));
+  }
+
+  public void inspect(Object obj) {
+    logger.debug(ToStringBuilder.reflectionToString(obj));
   }
 
 }

@@ -17,24 +17,12 @@
 package us.wedeliver.commons.util;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
-import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.StatusLine;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.helpers.CyclicBuffer;
 import org.apache.log4j.helpers.OptionConverter;
@@ -306,27 +294,14 @@ public class FlowdocAppender extends AppenderSkeleton {
     this.url = url;
   }
 
-  public String doPost(String fromUser, String msg) throws IOException {
-    List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-    nvps.add(new BasicNameValuePair("external_user_name", fromUser));
-    nvps.add(new BasicNameValuePair("content", msg));
+  public void doPost(String fromUser, String msg) throws IOException {
+    Map<String, Object> params = new HashMap<>();
+    params.put("external_user_name", fromUser);
+    params.put("content", msg);
 
-    HttpPost httpPost = new HttpPost(url + apiKey);
-    httpPost.setEntity(new UrlEncodedFormEntity(nvps));
-
-    try (CloseableHttpClient httpclient = HttpClients.createDefault();
-        CloseableHttpResponse response = httpclient.execute(httpPost)) {
-      StatusLine statusLine = response.getStatusLine();
-
-      HttpEntity entity = response.getEntity();
-      String content = IOUtils.toString(entity.getContent());
-
-      if (statusLine.getStatusCode() != HttpServletResponse.SC_OK)
-        throw new RuntimeException(String.format("Flowdoc Post Error: %s%n%s", statusLine, content));
-
-      EntityUtils.consume(entity);
-      return content;
-    }
+    HTTPResponse httpResponse = HTTPUtil.post(url + apiKey, params);
+    if (!httpResponse.isOK())
+      System.err.format("Flowdoc Post Error: %s%n%s", httpResponse.getStatus(), httpResponse.getContent());
   }
 
 }
