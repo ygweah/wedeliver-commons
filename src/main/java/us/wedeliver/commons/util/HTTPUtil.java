@@ -13,14 +13,20 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HTTPUtil {
+  private static final Logger logger = LoggerFactory.getLogger(HTTPUtil.class);
 
   public static final HTTPResponse get(String url) throws IOException {
+    logger.debug("HTTP GET: {}", url);
     HttpGet httpGet = new HttpGet(url);
     try (CloseableHttpClient httpclient = HttpClients.createDefault();
         CloseableHttpResponse response = httpclient.execute(httpGet)) {
-      return new HTTPResponse(response);
+      HTTPResponse httpResponse = new HTTPResponse(response);
+      logger.debug("HTTP GET Response: {}, {}", httpResponse.getCode(), httpResponse.getContent());
+      return httpResponse;
     }
   }
 
@@ -31,12 +37,24 @@ public class HTTPUtil {
         nvps.add(new BasicNameValuePair(mapEntry.getKey(), mapEntry.getValue().toString()));
     }
 
+    if (logger.isDebugEnabled()) {
+      StringBuilder sb = new StringBuilder();
+      for (NameValuePair nvp : nvps) {
+        if (sb.length() != 0)
+          sb.append(", ");
+        sb.append(nvp.getName()).append('=').append(nvp.getValue());
+      }
+      logger.debug("HTTP POST: {} - {}", url, sb);
+    }
+
     HttpPost httpPost = new HttpPost(url);
     httpPost.setEntity(new UrlEncodedFormEntity(nvps));
 
     try (CloseableHttpClient httpclient = HttpClients.createDefault();
         CloseableHttpResponse response = httpclient.execute(httpPost)) {
-      return new HTTPResponse(response);
+      HTTPResponse httpResponse = new HTTPResponse(response);
+      logger.debug("HTTP POST Response: {}, {}", httpResponse.getCode(), httpResponse.getContent());
+      return httpResponse;
     }
   }
 
