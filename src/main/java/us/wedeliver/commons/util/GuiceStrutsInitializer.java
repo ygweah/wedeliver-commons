@@ -27,7 +27,7 @@ public class GuiceStrutsInitializer extends GuiceServletContextListener {
     return (Injector) servletContext.getAttribute(INJECTOR_NAME);
   }
 
-  private Logger logger = LoggerFactory.getLogger(getClass());
+  protected Logger logger = LoggerFactory.getLogger(getClass());
   private Injector injector;
 
   @Override
@@ -73,18 +73,19 @@ public class GuiceStrutsInitializer extends GuiceServletContextListener {
   public void contextInitialized(ServletContextEvent servletContextEvent) {
     createInjector(servletContextEvent.getServletContext());
     super.contextInitialized(servletContextEvent);
-
   }
 
   @Override
   public void contextDestroyed(ServletContextEvent servletContextEvent) {
-    if (injector != null) {
-      ShutdownSupport shutdownSupport = injector.getInstance(ShutdownSupport.class);
-      shutdownSupport.shutdown();
+    try {
+      if (injector != null) {
+        ShutdownSupport shutdownSupport = injector.getInstance(ShutdownSupport.class);
+        shutdownSupport.shutdown();
+        injector = null;
+      }
+    } finally {
+      super.contextDestroyed(servletContextEvent);
     }
-
-    super.contextDestroyed(servletContextEvent);
-    injector = null;
   }
 
 }
