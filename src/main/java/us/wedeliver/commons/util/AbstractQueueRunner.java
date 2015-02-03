@@ -54,4 +54,16 @@ public abstract class AbstractQueueRunner<T> implements Runnable {
 
   protected abstract void process(T t) throws Exception;
 
+  protected <E> void putWithoutInterruption(BlockingQueue<E> output, E element) {
+    while (true) {
+      try {
+        output.put(element);
+        break;
+      } catch (InterruptedException e) {
+        logger.warn("Interrupted, ignore", e);
+        Thread.currentThread().interrupt();
+      }
+    }
+  }
+
 }
