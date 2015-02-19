@@ -48,7 +48,7 @@ public abstract class AbstractQueueRunner<T> implements Runnable {
     try {
       process(t);
     } catch (Exception e) {
-      logger.warn("Processing error", e);
+      logger.error("Processing error", e);
     }
   }
 
