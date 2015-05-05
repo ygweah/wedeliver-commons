@@ -32,7 +32,7 @@ dependencies {
 
   compile "javax.servlet:servlet-api:2.5"
 
-  compile ('org.apache.struts:struts2-core:2.3.16.3') {
+  compile ('org.apache.struts:struts2-core:2.3.20') {
     exclude group: 'javassist', module: 'javassist'
   }
 
@@ -41,7 +41,7 @@ dependencies {
   compile 'com.google.inject.extensions:guice-struts2:3.0'
   compile 'com.google.guava:guava:17.0'
   compile 'commons-codec:commons-codec:1.9'
-  compile 'com.sendgrid:sendgrid-java:1.2.0'
+  compile 'com.sendgrid:sendgrid-java:2.2.0'
   compile 'it.sauronsoftware.cron4j:cron4j:2.2.5'
 
   testCompile "junit:junit:4.11"
