@@ -47,7 +47,7 @@ dependencies {
   testCompile "junit:junit:4.11"
 
   // This is needed to publish jar to Cloudbees repo
-  archives 'org.apache.maven.wagon:wagon-webdav-jackrabbit:2.6'
+  archives 'org.apache.maven.wagon:wagon-webdav-jackrabbit:2.9'
 }
 
 /**
